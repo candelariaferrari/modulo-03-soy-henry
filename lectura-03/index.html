@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokédex Explorer</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>🔍 Pokédex Explorer</h1>
+
+    <form id="search-form">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Ej: pikachu, charizard, bulbasaur"
+        required
+      />
+
+      <button type="submit">
+        Buscar
+      </button>
+    </form>
+
+    <!-- Estado de carga -->
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p>Buscando Pokémon...</p>
+    </div>
+
+    <!-- Contenido exitoso -->
+    <div id="content" class="content hidden"></div>
+
+    <!-- Estado de error -->
+    <div id="error" class="error hidden">
+      <p id="error-message"></p>
+      <button id="retry-btn" type="button">
+        Reintentar
+      </button>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+
+</html>
