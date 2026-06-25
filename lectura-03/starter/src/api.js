@@ -1,49 +1,36 @@
 // ============================================================
 // api.js — Capa de comunicación con la PokéAPI
-// ============================================================
-// Tu tarea: implementar fetchJson() y getPokemon() con el
-// patrón correcto de doble await y validación de response.ok
+// Solo hace fetch. No toca el DOM ni modifica el estado.
 // ============================================================
 
 const BASE_URL = "https://pokeapi.co/api/v2/pokemon";
 
-// TODO 1: Implementar fetchJson(url)
-//
-// Esta función encapsula el patrón completo de fetch robusto:
-//
-//   Paso 1: await fetch(url)
-//           -> retorna un objeto Response (NO los datos todavía)
-//           -> este es el PRIMER await
-//
-//   Paso 2: if (!response.ok) throw new Error(...)
-//           -> CRÍTICO: fetch NO rechaza la promesa con 404 o 500
-//           -> debemos lanzar el error nosotros si response.ok === false
-//           -> sin esto, un 404 parece éxito
-//
-//   Paso 3: await response.json()
-//           -> deserializa el body del response a objeto JS
-//           -> este es el SEGUNDO await (necesario porque el body
-//              también es un stream asíncrono)
-//
-//   Paso 4: return data
+// fetchJson(url)
+// --------------
+// Helper reutilizable para cualquier request GET.
+// Resuelve el problema de que fetch() no rechaza en 404/500.
 export async function fetchJson(url) {
-    const response = await fetch(url)
-    if(!response.ok){
-        throw new Error(`HTTP ${response.status} - ${response.statusText}`)
-    }
-    const data = await response.json()
-    return data
-}
-// export async function fetchJson(url) { ... }
+  // 1er await: espera que llegue la respuesta de red
+  // En este punto solo tenemos los headers, no los datos todavía
+  const response = await fetch(url);
 
-// TODO 2: Implementar getPokemon(name)
-//
-// Construye la URL con BASE_URL y el nombre normalizado
-// (minúsculas, sin espacios) y llama a fetchJson().
-// Ejemplo de URL: https://pokeapi.co/api/v2/pokemon/pikachu
-//
-// export async function getPokemon(name) { ... }
-export async function getPokemon(name){
-    const url= `${BASE_URL}/${name.toLowerCase().trim()}`;
-    return await fetchJson(url)
+  // fetch() no lanza error con 404 o 500 — lo hacemos nosotros
+  // response.ok es true solo si el status está entre 200-299
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+  }
+
+  // 2do await: espera que el body se lea y se parsee como JSON
+  // Necesita su propio await porque leer el body también es asíncrono
+  const data = await response.json();
+  return data;
+}
+
+// getPokemon(name)
+// ----------------
+// Construye la URL para un pokémon específico y delega el fetch a fetchJson.
+// Normaliza el nombre: minúsculas y sin espacios extra.
+export async function getPokemon(name) {
+  const url = `${BASE_URL}/${name.toLowerCase().trim()}`;
+  return await fetchJson(url);
 }

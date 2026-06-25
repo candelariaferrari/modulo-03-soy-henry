@@ -1,39 +1,35 @@
 // ============================================================
 // state.js — Única fuente de verdad del estado de la app
 // ============================================================
-// Los 4 estados posibles de una operación asíncrona:
-//   "idle"    -> inicial, sin búsqueda
-//   "loading" -> fetch en curso
-//   "success" -> datos recibidos
-//   "error"   -> algo falló
+// No toca el DOM ni hace fetch.
+// Solo guarda el estado y lo expone de forma controlada.
 // ============================================================
 
-// TODO 1: Crear el objeto state con:
-//   - status: "idle" (valor inicial)
-//   - data: null
-//   - error: null
-//   - lastQuery: null  ← para guardar la última búsqueda (botón retry)
-//
- const state = {
-    status: "idle",
-    data: null,
-    error: null,
-    lastQuery: null,
-  }
+// El objeto state vive acá adentro y nunca se exporta directamente.
+// Solo se puede leer con getState() y modificar con setState().
+const state = {
+  status: "idle",   // "idle" | "loading" | "success" | "error"
+  data: null,       // datos del pokémon cuando status === "success"
+  error: null,      // mensaje de error cuando status === "error"
+  lastQuery: null,  // última búsqueda — permite que retry repita la misma
+};
 
-// TODO 2: Implementar getState()
-// Debe retornar una copia del state (no el objeto directo)
-// para evitar mutaciones accidentales desde afuera.
-// Tip: usar spread { ...state }
-//
- export function getState() { 
-    return {...state} //trae todas las propiedades
-  }
+// getState()
+// ----------
+// Devuelve una COPIA del estado, no el objeto original.
+// Así nadie puede modificar el estado accidentalmente desde afuera
+// haciendo algo como: getState().status = "error"
+export function getState() {
+  return { ...state };
+}
 
-// TODO 3: Implementar setState(updates)
-// Debe fusionar el estado actual con los cambios recibidos.
-// Tip: Object.assign(state, updates)
+// setState(updates)
+// -----------------
+// Recibe solo los campos que cambian y los fusiona con el estado actual.
+// El resto de los campos se mantienen como estaban.
 //
-export function setState(updates) { 
-    Object.assign(state, updates) // fuciona el estado viejo con el estado nuevo
- }
+// Ejemplo: setState({ status: "loading", data: null })
+// Solo modifica status y data — error y lastQuery no se tocan.
+export function setState(updates) {
+  Object.assign(state, updates);
+}
